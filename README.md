@@ -16,7 +16,7 @@ ApplicantName | Name of the person responsible for the CSR as presented to the R
 ApplicantEMail | E-Mail address of the person responsible for the CSR. This is the address the signed certificate will be sent to by the DFN PKI
 ApplicantOrgUnit | Organizational unit / Department of the person responsible for the CSR as presented to the RA
 SubjectDnSuffix | The mandatory suffix of your Certificate Subject's DN. You will find this suffix printed on your organization's DFN PKI Server certificate application page (`pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/pki?cmd=pkcs10_req;id=1;menu_item=2&RA_ID=<Your_RA_ID>`) and it will be formatted as `"O=<OrganizationName>,L=<City>,ST=<State>,C=<Country>"`
-RegistrationAuthorityID | The Registration authority ID number as issued to your organization by the DFN PKI. Part of the DFN PKI web interface URL: _`https://pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/pki?cmd=getStaticPage;name=index;id=1&RA_ID=`**`<Your_RA_ID\>`**_
+RegistrationAuthorityID | The Registration authority ID number as issued to your organization by the DFN PKI. Part of the DFN PKI web interface URL: _`https://pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/pki?cmd=getStaticPage;name=index;id=1&RA_ID=`**`<Your_RA_ID>`**_
 GenerateApplicationForm | Switch, generates the pre-filled DFN PKI application form for signing by the person responsible for the CSR, typically signed and archived by your organization's RA operators
 SmtpServerName | Optional: name of the SMTP server to use for sending the application form PDF to -ApplicantEMail
 SmtpFromEmail | Optional: E-Mail address to use as the "From:" address when sending the PDF application form to -ApplicantEMail
