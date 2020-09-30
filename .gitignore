@@ -1,1 +1,5 @@
-*.request
+pendingRequests/*.request
+pendingRequests/*.pdf
+acceptedRequests/*.request
+acceptedRequests/*.pdf
+logs/*
