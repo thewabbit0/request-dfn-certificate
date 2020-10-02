@@ -50,6 +50,13 @@ This script uses pre-compiled libraries of two other projects:
 * [The Legion of the Bouncy Castle C# API](http://www.bouncycastle.org/csharp/) for CSR decoding
 * [iTextSharp](https://github.com/itext/itextsharp) for PDF manipulation
 
+## Author
+Denis Jedig
+
+originally created for: Cologne University of Applied Sciences (TH Köln), Germany
+
+2020-10
+
 ## Foreign licenses
 ### The Legion of the Bouncy Castle C# API 
 
