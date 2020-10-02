@@ -88,6 +88,8 @@ Creates a certificate signing request off the specified template file using the 
     Param (
         [Parameter(Mandatory)]
         [string]$CertSubject,
+        [Parameter(Mandatory)]
+        [string[]]$ComputerFQDNs,
         [string]$RequestTemplateFile = "$PSScriptRoot\Templates\CertificateRequestTemplate.inf",
         [Parameter(Mandatory)]
         [int]$CertKeylength,
@@ -95,6 +97,7 @@ Creates a certificate signing request off the specified template file using the 
         [string]$CertHashAlgorithm 
     )
 
+    $SANString = "DNS=$($ComputerFQDNs -join '&DNS=')"
     # Read the template and expand its variables
     $CSRinf = $ExecutionContext.InvokeCommand.ExpandString((Get-Content -Path $RequestTemplateFile -Raw))
 
@@ -136,16 +139,18 @@ Creates a certificate signing request off the specified template file using the 
 
 }
 
+$ErrorActionPreference = "Stop"
+$VerboseActionPreference = "Continue"
+
 If(-not $psISE) {
     $ScriptName = $PSCommandPath -replace "^.+\\"
     Start-Transcript -Path "$PSScriptRoot\logs\$ScriptName.transcript" -Force
 }
 
-<#
 # Only allow to run elevated
 if (-NOT([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Throw "Administrator privileges are required to request a new machine certificate."
-} #>
+}
 
 Write-Verbose "Fetching system info for own host names from WMI..."
 # Get name and DNS suffix data from WMI
@@ -170,6 +175,7 @@ If(-not $SmtpFromEmail) {
 
 Write-Verbose "Generating a new Certificate Signing Request for 'CN=$ComputerPrimaryFQDN,$SubjectDnSuffix'"
 $CSR = New-CSR -CertSubject "CN=$ComputerPrimaryFQDN,$SubjectDnSuffix" `
+               -ComputerFQDNs $ComputerFQDNs `
                -CertKeylength $CertificateKeyLength `
                -CertHashAlgorithm $CertificateHashAlgorithm `
 
