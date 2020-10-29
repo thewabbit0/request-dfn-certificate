@@ -86,18 +86,23 @@ Creates a certificate signing request off the specified template file using the 
 #>
 
     Param (
+        # "subject" line of the certificate (distinguished name)
         [Parameter(Mandatory)]
         [string]$CertSubject,
+        # Array with "subject alternative name" entries, should include the CN of the subject
         [Parameter(Mandatory)]
-        [string[]]$ComputerFQDNs,
+        [string[]]$CertSANs,
+        # File name of the INF request template for use with certreq.exe
         [string]$RequestTemplateFile = "$PSScriptRoot\Templates\CertificateRequestTemplate.inf",
+        # Lenth of the generated RSA keys
         [Parameter(Mandatory)]
         [int]$CertKeylength,
+        # hash algorithm to use for signing
         [Parameter(Mandatory)]
         [string]$CertHashAlgorithm 
     )
 
-    $SANString = "DNS=$($ComputerFQDNs -join '&DNS=')"
+    $SANString = $CertSANs -join '&'
     # Read the template and expand its variables
     $CSRinf = $ExecutionContext.InvokeCommand.ExpandString((Get-Content -Path $RequestTemplateFile -Raw))
 
@@ -166,6 +171,7 @@ $WMINetworkAdapterConfiguration | ForEach-Object {
 
 $ComputerPrimaryFQDN = $ComputerFQDNs | Select-Object -First 1
 $ComputerFQDNs = [array]$ComputerFQDNs | Select-Object -Unique
+[string[]]$CertificateSANs = $ComputerFQDNs | ForEach-Object { "DNS=$_" }
 $Timestamp = (Get-Date -Format o) -replace "\..+" -replace ":"
 
 If(-not $SmtpFromEmail) {
@@ -175,7 +181,7 @@ If(-not $SmtpFromEmail) {
 
 Write-Verbose "Generating a new Certificate Signing Request for 'CN=$ComputerPrimaryFQDN,$SubjectDnSuffix'"
 $CSR = New-CSR -CertSubject "CN=$ComputerPrimaryFQDN,$SubjectDnSuffix" `
-               -ComputerFQDNs $ComputerFQDNs `
+               -CertSANs $CertificateSANs `
                -CertKeylength $CertificateKeyLength `
                -CertHashAlgorithm $CertificateHashAlgorithm `
 
@@ -195,7 +201,7 @@ $HashedPassword = ($PasswordBinaryHash | ForEach-Object { $_.ToString("x2") }) -
 $CertRole = "Web Server"
 
 Write-Verbose "Sending the CSR to the DFN PKI web service..."
-$CARequestId = $CA.newRequest($RegistrationAuthorityID, $CSR.PEM, $ComputerFQDNs, 
+$CARequestId = $CA.newRequest($RegistrationAuthorityID, $CSR.PEM, $CertificateSANs, 
                               $CertRole, $HashedPassword, $ApplicantName, $ApplicantEMail,
                               $ApplicantOrgUnit, $true)
 
@@ -207,7 +213,7 @@ $Data = [ordered]@{    RAID = $RegistrationAuthorityID
                        ApplicantName = $ApplicantName
                        ApplicantEmail = $ApplicantEMail
                        ApplicantOrgUnit = $ApplicantOrgUnit
-                       SubjectAlternativeNames = $ComputerFQDNs
+                       SubjectAlternativeNames = $CertificateSANs
                        CSR = $CSR.PEM | Out-String
                        RequestINF = $CSR.INF | Out-String
                        RequestTime = (Get-Date)}
