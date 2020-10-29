@@ -201,7 +201,7 @@ $HashedPassword = ($PasswordBinaryHash | ForEach-Object { $_.ToString("x2") }) -
 $CertRole = "Web Server"
 
 Write-Verbose "Sending the CSR to the DFN PKI web service..."
-$CARequestId = $CA.newRequest($RegistrationAuthorityID, $CSR.PEM, $CertificateSANs, 
+$CARequestId = $CA.newRequest($RegistrationAuthorityID, $CSR.PEM, ($CertificateSANs -replace "=", ":"), 
                               $CertRole, $HashedPassword, $ApplicantName, $ApplicantEMail,
                               $ApplicantOrgUnit, $true)
 
@@ -213,7 +213,7 @@ $Data = [ordered]@{    RAID = $RegistrationAuthorityID
                        ApplicantName = $ApplicantName
                        ApplicantEmail = $ApplicantEMail
                        ApplicantOrgUnit = $ApplicantOrgUnit
-                       SubjectAlternativeNames = $CertificateSANs
+                       SubjectAlternativeNames = ($CertificateSANs -replace "=", ":")
                        CSR = $CSR.PEM | Out-String
                        RequestINF = $CSR.INF | Out-String
                        RequestTime = (Get-Date)}
