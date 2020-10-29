@@ -1,4 +1,52 @@
-A set of scripts for requesting certificates from the German Research Network's CA (DFN PKI) for a Windows host.
+Skripte zum Beantragen von Zertifikaten von der [DFN PKI](https://www.pki.dfn.de) für einen Windows-Host
+
+## Features
+- Generiert einen Certificate Signing Request (CSR) mit den DNS-Namen des Hosts (verwendet die an den aktiven Netzwerkverbindungen definierten Hostnamen)
+- Übermittelt den CSR an den DFN PKI web service
+- Generiert das Formular "Zertifikatantrag für ein Serverzertifikat" mit vorausgefüllten Daten und verschickt diesen per E-Mail an den Antragsteller (optional)
+- Erstellt einen Scheduled Task für die regelmäßige Prüfung des Antragstatus und automatische Installation des signierten Zertifikates, sobald genehmigt
+
+## Nutzung
+
+`New-CertificateRequest.ps1` erstellt den Zertifikatsantrag. Die anderen Skripte in dem Verzeichnis werden von diesem Skript direkt oder indirekt genutzt.
+
+Parameter | Explanation
+--------- | -----------
+ApplicantName | Name  des Antragstellers (Person, die für den CSR und anschließend auch für das Schlüsselpaar verantwortlich ist)
+ApplicantEMail | E-Mail-Adresse des Antragstellers. An diese Adresse schickt das Skript das Formular für den Zertifikatsantrag und die DFN-PKI Infos zum Zertifikatsstatus
+ApplicantOrgUnit | "Abteilung" des Antragstellers (darf leer bleiben)
+SubjectDnSuffix | Der mandatorische Suffix für den DistinguishedName im "Subject"-Feld des Zertifikats. Der Suffix wird von der DFN-PKI für die antragstellende Organisation vorgegeben und erscheint auf der Beantragungswebseite für Serverzertifikate der DFN PKI (`pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/pki?cmd=pkcs10_req;id=1;menu_item=2&RA_ID=<Your_RA_ID>`) im Format `"O=<OrganizationsName>,L=<Stadt>,ST=<Bundesland>,C=<Land>"`
+RegistrationAuthorityID | Die Registration authority ID wie von der DFN PKI an die Organisation erteilt. Bestandteil der DFN PKI Web-Interface-URL: _`https://pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/pki?cmd=getStaticPage;name=index;id=1&RA_ID=`**`<Your_RA_ID>`**_
+GenerateApplicationForm | Switch, erstellt einen voraisgefüllten "Zertifikatantrag für ein Serverzertifikat" zur unterzeichnung durch den Antragsteller
+SmtpServerName | Optional: Name des SMTP-Servers für den E-Mail-Versand des Zertifikatantrag-Formulars an -ApplicantEMail
+SmtpFromEmail | Optional: E-Mail-Addresse, die als "From:"-Addresse für den E-Mail-Versand an -ApplicantEMail genutzt wird
+SmtpUseSSL | Switch, TLS-Verschlüsselung für die SMTP-Verbindung verwenden
+SmtpCredential | Optional: Credential für die Authentifizierung gegen -SmtpServerName (wie Powershell's `Get-Credential` zurückgeliefert)
+CertificateKeyLength | Bit-Länge der RSA-Schlüssel im erstellten Private/Public-Schlüsselpaar für das Zertifikat. Standardwert: 2048
+CertificateHashAlgorithm | Hash-Algotithmus für die CA-Signatur des Zertifikats. Standardwert: SHA256
+PublicSOAPUri | Die URI des DFN PKI SOAP "public" Webservice. Standardwert: `"https://pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/soap?wsdl=1"`
+
+
+### Beispiel
+```
+New-CertificateRequest.ps1 -ApplicantName "Denis Jedig" -ApplicantEMail "denis.jedig@th-koeln.de" `
+                           -ApplicantOrgUnit "Campus IT" `
+                           -SubjectDnSuffix "O=Technische Hochschule Koeln,L=Koeln,ST=Nordrhein-Westfalen,C=DE" `
+                           -RegistrationAuthorityID 1520 -RegisterFetchingTask -GenerateApplicationForm `
+                           -SmtpServerName "smtp.intranet.fh-koeln.de" 
+```
+
+Obiges beantragt ein neues Zertifikat, generiert das PDF-Formular des Zertifikatsantrags, verschickt es per E-Mail und registriert
+in der Windows-Aufgabenplanung einen neuen Task, um regelmäßig nachzuschauen, ob der Zertifikatsantrag geneghmigt wurde.
+Der Task läuft nach einem Monat ab. Wenn der Zertifikatsantrag vor Ablauf dieser Zeit genehmigt wurde, wird das Zertifikat
+heruntergeladen und installiert und der Task automatisch entfernt.
+
+## Protokollierung
+Die Skripte schreiben ihre Transcripts ind das Verzeichnis `.\log`
+
+--------
+
+A set of scripts for requesting certificates from the [German Research Network's CA (DFN PKI)](https://www.pki.dfn.de) for a Windows host.
 
 ## Features
 - Generates a Certificate Signing Request (CSR) with the DNS names registered on the host's network connections
