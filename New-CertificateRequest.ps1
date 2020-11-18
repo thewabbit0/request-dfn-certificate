@@ -25,6 +25,14 @@ Param(
     [Parameter(Mandatory)]
     [ValidatePattern('^O=[^,]+,L=[^,]+,ST=[^,]+,C=[^,]+$')]
     [string]$SubjectDnSuffix,
+    # DFN PKI certificate role/profile to use (defaults to "Web Server"), see 
+    # https://www.pki.dfn.de/fileadmin/PKI/anleitungen/DFN-PKI-Zertifikatprofile_Global.pdf
+    # for a detailed documentation to the available values
+    [Parameter(Mandatory)]
+    [ValidateSetAttribute("Web Server", "LDAP Server", "Mail Server", "VPN Server", "Radius Server", 
+                          "Shibboleth IdP SP","Domain Controller", "Exchange Server", "Webserver MustStaple",
+                          "Web Server SOAP", "VoIP Server", "802.1X Client")]
+    [string]$CertificateRole = "Web Server",
     # Length of the RSA keys in the generated private/public keypair
     [int]$CertificateKeyLength = 2048,
     # Hash algorithm to use in the request
@@ -198,18 +206,16 @@ $Password = [System.Web.Security.Membership]::GeneratePassword($Pwlength, $Pwnon
 $PasswordBinaryHash = [System.Security.Cryptography.HashAlgorithm]::Create("SHA1").ComputeHash([System.Text.Encoding]::UTF8.GetBytes($Password))
 $HashedPassword = ($PasswordBinaryHash | ForEach-Object { $_.ToString("x2") }) -join ""
 
-$CertRole = "Web Server"
-
 Write-Verbose "Sending the CSR to the DFN PKI web service..."
 $CARequestId = $CA.newRequest($RegistrationAuthorityID, $CSR.PEM, ($CertificateSANs -replace "=", ":"), 
-                              $CertRole, $HashedPassword, $ApplicantName, $ApplicantEMail,
+                              $CertificateRole, $HashedPassword, $ApplicantName, $ApplicantEMail,
                               $ApplicantOrgUnit, $true)
 
 $Data = [ordered]@{    RAID = $RegistrationAuthorityID
                        RequestID = $CARequestId
                        HashedPassword = $HashedPassword
                        Password = $Password
-                       CertificateRole = $CertRole
+                       CertificateRole = $CertificateRole
                        ApplicantName = $ApplicantName
                        ApplicantEmail = $ApplicantEMail
                        ApplicantOrgUnit = $ApplicantOrgUnit

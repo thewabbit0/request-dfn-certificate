@@ -22,6 +22,7 @@ SmtpServerName | Optional: Name des SMTP-Servers für den E-Mail-Versand des Zer
 SmtpFromEmail | Optional: E-Mail-Addresse, die als "From:"-Addresse für den E-Mail-Versand an -ApplicantEMail genutzt wird
 SmtpUseSSL | Switch, TLS-Verschlüsselung für die SMTP-Verbindung verwenden
 SmtpCredential | Optional: Credential für die Authentifizierung gegen -SmtpServerName (wie Powershell's `Get-Credential` zurückgeliefert)
+CertificateRole | Rolle/Profil für das Zertifikat. Die [DFN-PKI-Dokumentation](https://www.pki.dfn.de/fileadmin/PKI/anleitungen/DFN-PKI-Zertifikatprofile_Global.pdf) erläutert die Auswirkungen der möglichen Werte. Standardwert: "Web Server"
 CertificateKeyLength | Bit-Länge der RSA-Schlüssel im erstellten Private/Public-Schlüsselpaar für das Zertifikat. Standardwert: 2048
 CertificateHashAlgorithm | Hash-Algotithmus für die CA-Signatur des Zertifikats. Standardwert: SHA256
 PublicSOAPUri | Die URI des DFN PKI SOAP "public" Webservice. Standardwert: `"https://pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/soap?wsdl=1"`
@@ -70,6 +71,7 @@ SmtpServerName | Optional: name of the SMTP server to use for sending the applic
 SmtpFromEmail | Optional: E-Mail address to use as the "From:" address when sending the PDF application form to -ApplicantEMail
 SmtpUseSSL | Switch, makes the SMTP connection negotiate TLS encryption
 SmtpCredential | Optional credential (as returned by Powershell's `Get-Credential`) to use for authentication with -SmtpServerName
+CertificateRole | Role/profile for the requested certificate. The [DFN PKI documentation](https://www.pki.dfn.de/fileadmin/PKI/anleitungen/DFN-PKI-Zertifikatprofile_Global.pdf) explains the implications of the different possible values. Default: "Web Server"
 CertificateKeyLength | Length of the RSA keys in the generated Private/Public keypair for the certificate. Defaults to 2048 bits if not specified.
 CertificateHashAlgorithm | Requested hash algorithm to use for the CA's signature. Defaults to SHA256 if not specified.
 PublicSOAPUri | The URI of the DFN PKI SOAP service. Defaults to `"https://pki.pca.dfn.de/dfn-ca-global-g2/cgi-bin/pub/soap?wsdl=1"` if not specified.
