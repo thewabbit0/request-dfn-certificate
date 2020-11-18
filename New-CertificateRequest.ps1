@@ -29,9 +29,9 @@ Param(
     # https://www.pki.dfn.de/fileadmin/PKI/anleitungen/DFN-PKI-Zertifikatprofile_Global.pdf
     # for a detailed documentation to the available values
     [Parameter(Mandatory)]
-    [ValidateSetAttribute("Web Server", "LDAP Server", "Mail Server", "VPN Server", "Radius Server", 
-                          "Shibboleth IdP SP","Domain Controller", "Exchange Server", "Webserver MustStaple",
-                          "Web Server SOAP", "VoIP Server", "802.1X Client")]
+    [ValidateSet("Web Server", "LDAP Server", "Mail Server", "VPN Server", "Radius Server", 
+				 "Shibboleth IdP SP","Domain Controller", "Exchange Server", "Webserver MustStaple",
+				 "Web Server SOAP", "VoIP Server", "802.1X Client")]
     [string]$CertificateRole = "Web Server",
     # Length of the RSA keys in the generated private/public keypair
     [int]$CertificateKeyLength = 2048,
